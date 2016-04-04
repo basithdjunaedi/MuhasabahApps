@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.github.florent37.parallax.ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.tsalatsa.com.muhasabahapps.ParallaxActivity"
+    tools:showIn="@layout/app_bar_parallax"
+    android:background="#303030">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.github.florent37.parallax.ParallaxView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:parallaxVertical="1.1">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/background"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:gravity="center"
+                android:text="Muhahasab Apps"
+                android:textSize="30dp"
+                android:textColor="@color/colorGrey"/>
+
+        </com.github.florent37.parallax.ParallaxView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="200dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+            <include layout="@layout/card_view"></include>
+
+        </LinearLayout>
+    </FrameLayout>
+
+</com.github.florent37.parallax.ScrollView>

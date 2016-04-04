@@ -7,9 +7,4 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_parallax"
-        android:title="Parallax"
-        app:showAsAction="never"/>
-
 </menu>

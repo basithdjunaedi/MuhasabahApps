@@ -1,5 +1,6 @@
 package com.tsalatsa.com.muhasabahapps;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -117,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if (id == R.id.action_parallax){
+            startActivity(new Intent(getApplicationContext(), ParallaxActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
