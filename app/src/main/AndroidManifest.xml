@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tsalatsa.com.muhasabahapps">
+    package="com.tsalatsah.muhasabahapps">
 
     <application
         android:allowBackup="true"
@@ -25,7 +25,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.tsalatsa.com.muhasabahapps.MainActivity" />
+                android:value="com.tsalatsah.muhasabahapps.MainActivity" />
         </activity>
     </application>
 

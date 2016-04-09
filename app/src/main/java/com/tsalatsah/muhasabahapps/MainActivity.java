@@ -1,4 +1,4 @@
-package com.tsalatsa.com.muhasabahapps;
+package com.tsalatsah.muhasabahapps;
 
 import android.content.Intent;
 import android.os.Bundle;

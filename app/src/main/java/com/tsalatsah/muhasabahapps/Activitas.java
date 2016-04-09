@@ -1,4 +1,4 @@
-package com.tsalatsa.com.muhasabahapps;
+package com.tsalatsah.muhasabahapps;
 
 /**
  * Created by root on 02/04/16.
