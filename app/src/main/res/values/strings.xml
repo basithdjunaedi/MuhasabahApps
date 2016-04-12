@@ -4,4 +4,5 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_parallax">ParallaxActivity</string>
+    <string name="google_client_id">191438625878-kpio98omuu9sh3hjc8bt3lamraodhpcf.apps.googleusercontent.com</string>
 </resources>

@@ -11,4 +11,9 @@
         android:id="@+id/action_parallax"
         android:title="Parallax"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_login"
+        android:title="Login"
+        app:showAsAction="never"/>
 </menu>
