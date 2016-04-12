@@ -25,16 +25,16 @@ import com.tsalatsah.muhasabahapps.authentication.Authenticator;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class ParallaxActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = ParallaxActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
     AccountManager accountManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_parallax);
+        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
