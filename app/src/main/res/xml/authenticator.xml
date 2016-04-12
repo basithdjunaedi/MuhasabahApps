@@ -1,5 +1,5 @@
 <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="com.user.tes"
+    android:accountType="com.muhasabahapps.user"
     android:icon="@drawable/common_plus_signin_btn_icon_dark_normal"
     android:smallIcon="@drawable/common_plus_signin_btn_icon_dark_normal"
     android:label="@string/app_name"

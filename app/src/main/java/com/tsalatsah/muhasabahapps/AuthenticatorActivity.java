@@ -29,7 +29,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
         switch (id) {
             case R.id.btnLogin:
                 AccountManager accountManager = AccountManager.get(getApplicationContext());
-                Account account = new Account("Nurul Huda", "com.user.tes");
+                Account account = new Account("Nurul Huda", Authenticator.ACCOUNT_TYPE);
 
                 accountManager.addAccountExplicitly(account, null, null);
                 accountManager.setAuthToken(account, Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, "initokenku");

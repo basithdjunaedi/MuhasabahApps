@@ -87,26 +87,6 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         }
-        else if (id == R.id.action_login) {
-            final Account accounts[] = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-
-            AccountManagerFuture<Bundle> tokens = accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
-                    Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, this, null, null, new AccountManagerCallback<Bundle>() {
-                        @Override
-                        public void run(AccountManagerFuture<Bundle> future) {
-                            Log.d(TAG, "Accounts -> " + Arrays.toString(accounts));
-                            try {
-                                Log.d(TAG, "tokens -> " + future.getResult().getString(AccountManager.KEY_AUTHTOKEN));
-                            } catch (OperationCanceledException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (AuthenticatorException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, null);
-        }
 
         return super.onOptionsItemSelected(item);
     }

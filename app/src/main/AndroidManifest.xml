@@ -18,15 +18,17 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".AuthenticatorActivity" />
+        <activity android:name=".activities.flashscreen.FlashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-
-        <service android:name=".services.AuthenticatorService"
+        <service
+            android:name=".services.AuthenticatorService"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -36,8 +38,6 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-
-        <activity android:name=".AuthenticatorActivity"></activity>
     </application>
 
 </manifest>
