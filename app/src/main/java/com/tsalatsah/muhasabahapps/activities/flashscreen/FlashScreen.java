@@ -81,7 +81,7 @@ public class FlashScreen extends Activity implements Runnable
     public void run() {
         Log.d(TAG, "The thread is launched");
         try {
-            thread.sleep(2000);
+            thread.sleep(22000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

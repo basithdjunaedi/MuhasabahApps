@@ -11,8 +11,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.tsalatsah.muhasabahapps.AuthenticatorActivity;
-import com.tsalatsah.muhasabahapps.LoginActivity;
+import com.tsalatsah.muhasabahapps.activities.authenticator.AuthenticatorActivity;
 
 /**
  * Created by ibnujakaria on 10/04/16.
