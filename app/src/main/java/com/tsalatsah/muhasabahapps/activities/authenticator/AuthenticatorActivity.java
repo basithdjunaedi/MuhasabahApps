@@ -43,9 +43,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
 //                accountManager.addAccountExplicitly(account, null, null);
 //                accountManager.setAuthToken(account, Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, "initokenku");
 //
-//                Bundle result = new Bundle();
-//                setAccountAuthenticatorResult(result);
-//                finish();
 //        }
+    }
+
+    public void doneLogin () {
+        Bundle result = new Bundle();
+        setAccountAuthenticatorResult(result);
+        finish();
     }
 }

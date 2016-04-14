@@ -20,6 +20,9 @@ public class Authenticator extends AbstractAccountAuthenticator {
 
     public static final String ACCOUNT_TYPE = "com.muhasabahapps.user";
     public static final String ACCOUNT_AUTH_TOKEN_TYPE = "fullaccess";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_EMAIL = "email";
+    public static final String KEY_AVATAR = "avatar";
     private final String TAG = Authenticator.class.getSimpleName();
     private final Context mContext;
 

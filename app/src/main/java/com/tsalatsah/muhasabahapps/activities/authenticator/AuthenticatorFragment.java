@@ -45,11 +45,35 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
         super.onAttach(context);
 
         mContext = context;
+
+        Log.d(TAG, "onAttach");
+        Log.d(TAG, "mContext -> " + mContext);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate");
+        Log.d(TAG, "mContext -> " + mContext);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Log.d(TAG, "onStart");
+        Log.d(TAG, "mContext -> " + mContext);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View layout = inflater.inflate(R.layout.fragment_authenticator, container, false);
+        mContext = layout.getContext();
+        Log.d(TAG, "onCreateView");
+        Log.d(TAG, "mContext -> " + mContext);
+
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -60,24 +84,12 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        btnSignIn = (SignInButton) getActivity().findViewById(R.id.sign_in_button);
+        btnSignIn = (SignInButton) layout.findViewById(R.id.sign_in_button);
         btnSignIn.setOnClickListener(this);
 
         mAccountManager = AccountManager.get(mContext);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
         mGoogleApiClient.connect();
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View layout = inflater.inflate(R.layout.fragment_authenticator, container, false);
-
         return layout;
     }
 
@@ -106,7 +118,16 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
             Log.d(TAG, "avatar -> " + account.getPhotoUrl());
 
             Account user = new Account(account.getDisplayName(), Authenticator.ACCOUNT_TYPE);
-//            mAccountManager.addAccountExplicitly(user, "", null);
+            Bundle userData = new Bundle();
+            userData.putString(Authenticator.KEY_NAME, account.getDisplayName());
+            userData.putString(Authenticator.KEY_EMAIL, account.getEmail());
+            userData.putString(Authenticator.KEY_AVATAR, account.getPhotoUrl().toString());
+            mAccountManager.addAccountExplicitly(user, null, userData);
+
+            AuthenticatorActivity mActivity = (AuthenticatorActivity) getActivity();
+            if (mActivity != null) {
+                mActivity.doneLogin();
+            }
         }
         else {
             Log.d(TAG, "login gagal");
