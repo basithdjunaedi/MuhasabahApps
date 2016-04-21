@@ -12,7 +12,7 @@ import android.widget.Button;
 import com.tsalatsah.muhasabahapps.R;
 import com.tsalatsah.muhasabahapps.authentication.Authenticator;
 
-public class AuthenticatorActivity extends AccountAuthenticatorActivity implements View.OnClickListener {
+public class AuthenticatorActivity extends AccountAuthenticatorActivity{
 
     private AuthenticatorFragment authenticatorFragment;
 
@@ -31,20 +31,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity implemen
     }
 
 
-    @Override
-    public void onClick(View v) {
-//        int id = v.getId();
-
-//        switch (id) {
-//            case R.id.btnLogin:
-//                AccountManager accountManager = AccountManager.get(getApplicationContext());
-//                Account account = new Account("Nurul Huda", Authenticator.ACCOUNT_TYPE);
-//
-//                accountManager.addAccountExplicitly(account, null, null);
-//                accountManager.setAuthToken(account, Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, "initokenku");
-//
-//        }
-    }
 
     public void doneLogin () {
         Bundle result = new Bundle();

@@ -1,11 +1,6 @@
-package com.tsalatsah.muhasabahapps;
+package com.tsalatsah.muhasabahapps.activities.main;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,16 +15,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.tsalatsah.muhasabahapps.authentication.Authenticator;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.ResponseHandlerInterface;
+import com.tsalatsah.muhasabahapps.R;
+import com.tsalatsah.muhasabahapps.api.CategoryApi;
 
-import java.io.IOException;
-import java.util.Arrays;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     AccountManager accountManager;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -56,8 +57,30 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        accountManager = AccountManager.get(getApplicationContext());
+        getCategoryFromServer();
     }
+
+    private void getCategoryFromServer() {
+        CategoryApi categoryApi = new CategoryApi(getApplicationContext());
+
+        Log.d(TAG, "get category from server called...");
+        categoryApi.get(new JsonHttpResponseHandler(){
+            @Override
+            public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
+                Snackbar
+                        .make(fab, "Load categories...", Snackbar.LENGTH_SHORT)
+                        .show();
+
+                Log.d(TAG, "load categories...");
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d(TAG, "response -> " + response.toString());
+            }
+        });
+    }
+
 
     @Override
     public void onBackPressed() {
