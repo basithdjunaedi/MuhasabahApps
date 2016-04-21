@@ -42,14 +42,10 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
 
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
-            <include layout="@layout/card_view"></include>
+            <ListView
+                android:id="@+id/categoryList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"></ListView>
 
         </LinearLayout>
     </FrameLayout>

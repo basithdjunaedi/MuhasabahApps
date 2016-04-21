@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = MainActivity.class.getSimpleName();
     AccountManager accountManager;
     FloatingActionButton fab;
+    CustomListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        adapter = new CustomListAdapter(this);
         getCategoryFromServer();
     }
 
@@ -76,6 +79,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                ListView categoryList = (ListView) findViewById(R.id.categoryList);
+                adapter.setJSONResponse(response);
+                adapter.notifyDataSetChanged();
+                categoryList.setAdapter(adapter);
                 Log.d(TAG, "response -> " + response.toString());
             }
         });
