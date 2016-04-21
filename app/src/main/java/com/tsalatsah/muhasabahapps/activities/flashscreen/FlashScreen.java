@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.tsalatsah.muhasabahapps.MainActivity;
+import com.tsalatsah.muhasabahapps.activities.main.MainActivity;
 import com.tsalatsah.muhasabahapps.R;
 import com.tsalatsah.muhasabahapps.authentication.Authenticator;
 

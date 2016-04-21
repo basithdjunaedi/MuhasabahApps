@@ -22,8 +22,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
+import com.tsalatsah.muhasabahapps.api.UserApi;
 import com.tsalatsah.muhasabahapps.authentication.Authenticator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
 
 /*
 * This fragment is used to authenticate users using their google accounts
@@ -37,6 +47,8 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
     private GoogleApiClient mGoogleApiClient;
     private SignInButton btnSignIn;
     private AccountManager mAccountManager;
+
+    private UserApi userApi;
 
     private Context mContext;
 
@@ -54,8 +66,6 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "onCreate");
-        Log.d(TAG, "mContext -> " + mContext);
     }
 
     @Override
@@ -71,8 +81,6 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View layout = inflater.inflate(R.layout.fragment_authenticator, container, false);
         mContext = layout.getContext();
-        Log.d(TAG, "onCreateView");
-        Log.d(TAG, "mContext -> " + mContext);
 
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -88,6 +96,7 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
         btnSignIn.setOnClickListener(this);
 
         mAccountManager = AccountManager.get(mContext);
+        userApi = new UserApi(mContext);
 
         mGoogleApiClient.connect();
         return layout;
@@ -106,7 +115,7 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
 
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
-            GoogleSignInAccount account = result.getSignInAccount();
+            final GoogleSignInAccount account = result.getSignInAccount();
             Toast
                     .makeText(getActivity().getApplicationContext(), "Welcome " + account.getDisplayName(), Toast.LENGTH_SHORT)
                     .show();
@@ -117,12 +126,36 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
             Log.d(TAG, "token -> " + account.getIdToken());
             Log.d(TAG, "avatar -> " + account.getPhotoUrl());
 
-            Account user = new Account(account.getDisplayName(), Authenticator.ACCOUNT_TYPE);
-            Bundle userData = new Bundle();
+            final Account user = new Account(account.getDisplayName(), Authenticator.ACCOUNT_TYPE);
+            final Bundle userData = new Bundle();
             userData.putString(Authenticator.KEY_NAME, account.getDisplayName());
             userData.putString(Authenticator.KEY_EMAIL, account.getEmail());
             userData.putString(Authenticator.KEY_AVATAR, account.getPhotoUrl().toString());
-            mAccountManager.addAccountExplicitly(user, null, userData);
+
+            // call the api to verify the data
+            RequestParams params = new RequestParams();
+            params.add("google-id-token", account.getIdToken());
+            userApi.authenticate(params, new JsonHttpResponseHandler(){
+                @Override
+                public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
+                    Log.d(TAG, "right before requesting to server");
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        JSONObject userResponse = response.getJSONObject("user");
+                        String jwt = response.getString("token");
+
+                        mAccountManager.addAccountExplicitly(user, null, userData);
+                        mAccountManager.setAuthToken(user, Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, jwt);
+                        Log.d(TAG, "response -> " + response.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d(TAG, "response -> "+response.toString());
+                }
+            });
 
             AuthenticatorActivity mActivity = (AuthenticatorActivity) getActivity();
             if (mActivity != null) {
