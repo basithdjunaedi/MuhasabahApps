@@ -48,15 +48,46 @@ public class CategoryApi extends Api{
                             e.printStackTrace();
                         } catch (AuthenticatorException e) {
                             e.printStackTrace();
-                        }
-
-                        Log.d(TAG, "token -> " + token);
+                        };
 
                         if (token != null) {
                             RequestParams params = new RequestParams();
                             params.add("token", token);
 
                             client.get(CATEGORY_GET_URL, params, handler);
+                        }
+                    }
+                }, null);
+    }
+
+    public void newCategory(final String name, final String type, final AsyncHttpResponseHandler handler)
+    {
+        // get the token from AccontManager
+        AccountManager accountManager = AccountManager.get(context);
+
+        accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
+                Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
+                new AccountManagerCallback<Bundle>() {
+                    @Override
+                    public void run(AccountManagerFuture<Bundle> future) {
+                        String token = null;
+                        try {
+                            token = future.getResult().getString("authtoken");
+                        } catch (OperationCanceledException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (AuthenticatorException e) {
+                            e.printStackTrace();
+                        };
+
+                        if (token != null) {
+                            RequestParams params = new RequestParams();
+                            params.put("token", token);
+                            params.put("name", name);
+                            params.put("type", type);
+
+                            client.post(Api.CATEGORY_NEW_URL + "?" + params.toString(), null, handler);
                         }
                     }
                 }, null);
