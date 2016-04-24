@@ -1,6 +1,7 @@
 package com.tsalatsah.muhasabahapps.activities.main;
 
 import android.accounts.AccountManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.widget.ListView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
+import com.tsalatsah.muhasabahapps.activities.category.NewCategoryActivity;
 import com.tsalatsah.muhasabahapps.api.CategoryApi;
 
 import org.json.JSONObject;
@@ -45,8 +47,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(getApplicationContext(), NewCategoryActivity.class);
+                startActivity(intent);
             }
         });
 
