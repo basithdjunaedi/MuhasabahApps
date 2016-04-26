@@ -13,5 +13,6 @@ public class Api {
     public static final String CATEGORY_NEW_URL = BASE_URL + "categories/new";
     public static final String CATEGORY_SHOW_URL = BASE_URL + "categories/";
 
+
     protected static AsyncHttpClient client = new AsyncHttpClient();
 }
