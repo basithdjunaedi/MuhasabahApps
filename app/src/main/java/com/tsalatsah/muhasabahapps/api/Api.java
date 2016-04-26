@@ -7,7 +7,8 @@ import com.tsalatsah.muhasabahapps.BuildConfig;
  * Created by ibnujakaria on 16/04/16.
  */
 public class Api {
-    public static final String BASE_URL = "http://192.168.0.96:8080/api/";
+
+    public static final String BASE_URL = "http://192.168.43.26:8080/api/";
     public static final String LOGIN_URL = BASE_URL + "auth/authenticate";
     public static final String CATEGORY_GET_URL = BASE_URL + "categories";
     public static final String CATEGORY_NEW_URL = BASE_URL + "categories/new";
