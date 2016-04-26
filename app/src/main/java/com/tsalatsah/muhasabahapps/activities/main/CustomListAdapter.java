@@ -18,7 +18,7 @@ import org.json.JSONObject;
 /**
  * Created by ibnujakaria on 21/04/16.
  */
-public class CustomListAdapter extends BaseAdapter implements View.OnClickListener{
+public class CustomListAdapter extends BaseAdapter{
 
     private JSONArray categories;
     private LayoutInflater inflater;
@@ -91,11 +91,5 @@ public class CustomListAdapter extends BaseAdapter implements View.OnClickListen
 
         Log.d("tes", "memanggil view ke-" + position);
         return view;
-    }
-
-    @Override
-    public void onClick(View v)
-    {
-
     }
 }

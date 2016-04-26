@@ -17,7 +17,7 @@
         <activity
             android:name=".activities.main.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.authenticator.AuthenticatorActivity" />
         <activity android:name=".activities.flashscreen.FlashScreen">
             <intent-filter>
@@ -42,6 +42,9 @@
         <activity
             android:name=".activities.category.NewCategoryActivity"
             android:label="Kategori Baru"
+            android:parentActivityName=".activities.main.MainActivity" />
+        <activity
+            android:name=".activities.category.DetailCategory"
             android:parentActivityName=".activities.main.MainActivity"></activity>
     </application>
 
