@@ -32,8 +32,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.UnsupportedEncodingException;
+
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpResponse;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class NewCategoryActivity extends AppCompatActivity implements View.OnClickListener
 {
@@ -214,6 +217,17 @@ public class NewCategoryActivity extends AppCompatActivity implements View.OnCli
         CategoryApi categoryApi = new CategoryApi(getApplicationContext());
         final Snackbar snackbar = Snackbar.make(submitButton, "Loading...", Snackbar.LENGTH_INDEFINITE);
 
+        categoryApi.newCategory(dataPost, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Log.d(TAG, new String(responseBody));
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.d(TAG, new String(responseBody));
+            }
+        });
 //        categoryApi.newCategory(categoryNameEditText.getText().toString(), getTypeValue(), new AsyncHttpResponseHandler(){
 //            @Override
 //            public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {

@@ -10,11 +10,26 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
+import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.tsalatsah.muhasabahapps.authentication.Authenticator;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cz.msebera.android.httpclient.entity.StringEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.protocol.HTTP;
 
 /**
  * Created by ibnujakaria on 19/04/16.
@@ -60,7 +75,7 @@ public class CategoryApi extends Api{
                 }, null);
     }
 
-    public void newCategory(final String name, final String type, final AsyncHttpResponseHandler handler)
+    public void newCategory(final JSONObject dataPost, final AsyncHttpResponseHandler handler)
     {
         // get the token from AccontManager
         AccountManager accountManager = AccountManager.get(context);
@@ -82,12 +97,33 @@ public class CategoryApi extends Api{
                         };
 
                         if (token != null) {
-                            RequestParams params = new RequestParams();
-                            params.put("token", token);
-                            params.put("name", name);
-                            params.put("type", type);
+                            try {
+                                // aku wes bingung. Iki gak work kabeh
 
-                            client.post(Api.CATEGORY_NEW_URL + "?" + params.toString(), null, handler);
+                                List <Map<String, String>> records = new ArrayList<Map<String, String>>();
+
+                                for (int i = 0; i < dataPost.getJSONArray("records").length(); i++) {
+                                    JSONArray jsonArray = dataPost.getJSONArray("records");
+                                    JSONObject record = new JSONObject(jsonArray.getString(i));
+                                    HashMap<String, String> map = new HashMap<String, String>();
+                                    map.put("name", record.getString("name"));
+                                    map.put("type", record.getString("type"));
+                                    records.add(map);
+                                }
+
+                                RequestParams params = new RequestParams();
+                                params.put("records", records);
+                                params.put("name", dataPost.getString("name"));
+
+                                Log.d(TAG, "params encoded -> " + URLEncoder.encode(params.toString(), "UTF-8"));
+                                Log.d(TAG, "params decoded -> " + params.toString());
+                                client.post(Api.CATEGORY_NEW_URL + "?token=" + token, params, handler);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }, null);
