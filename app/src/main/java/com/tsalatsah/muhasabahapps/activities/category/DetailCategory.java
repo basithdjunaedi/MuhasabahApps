@@ -23,6 +23,7 @@ public class DetailCategory extends AppCompatActivity {
     private static final String TAG = DetailCategory.class.getSimpleName();
     private JSONObject category;
     private SubCategoryAdapter subCategoryAdapter;
+    private RecordAdapter recordAdapter;
     private TextView loadingText;
 
     @Override
@@ -41,7 +42,8 @@ public class DetailCategory extends AppCompatActivity {
         }
 
         loadingText = (TextView) findViewById(R.id.loadingText);
-        subCategoryAdapter = new SubCategoryAdapter(getApplicationContext());
+        subCategoryAdapter = new SubCategoryAdapter(this);
+        recordAdapter = new RecordAdapter(this);
     }
 
     private void callApiToLoadTheDataOfThisCategory() throws JSONException{
@@ -61,10 +63,9 @@ public class DetailCategory extends AppCompatActivity {
         categoryApi.getCategoryDetail(category.getInt("id"), new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                ListView listView = (ListView) findViewById(R.id.listView);
 
                 if (hasSubCategory) {
-                    ListView listView = (ListView) findViewById(R.id.listView);
-
                     try {
                         JSONObject responseCategory = response.getJSONObject("category");
                         JSONArray subCategories = responseCategory.getJSONArray("sub_categories");
@@ -81,8 +82,27 @@ public class DetailCategory extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                else {
+                    try {
+                        JSONObject responseCategory = response.getJSONObject("category");
+                        JSONArray records = responseCategory.getJSONArray("records");
+                        recordAdapter.setJSONResponse(records);
+                        listView.setAdapter(recordAdapter);
+
+
+                        if (records.length() > 0)
+                            loadingText.setVisibility(View.GONE);
+                        else
+                            loadingText.setText("Sub kategori kosong.");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
                 Log.d(TAG, "response -> " + response.toString());
             }
         });
     }
+
+
 }
