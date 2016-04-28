@@ -92,4 +92,34 @@ public class CategoryApi extends Api{
                     }
                 }, null);
     }
+
+    public void getCategoryDetail(final int id, final AsyncHttpResponseHandler handler) {
+        // get the token from AccontManager
+        AccountManager accountManager = AccountManager.get(context);
+
+        accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
+                Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
+                new AccountManagerCallback<Bundle>() {
+                    @Override
+                    public void run(AccountManagerFuture<Bundle> future) {
+                        String token = null;
+                        try {
+                            token = future.getResult().getString("authtoken");
+                        } catch (OperationCanceledException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (AuthenticatorException e) {
+                            e.printStackTrace();
+                        };
+
+                        if (token != null) {
+                            RequestParams params = new RequestParams();
+                            params.put("token", token);
+
+                            client.get(Api.CATEGORY_SHOW_URL+id, params, handler);
+                        }
+                    }
+                }, null);
+    }
 }

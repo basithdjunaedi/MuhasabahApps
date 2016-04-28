@@ -1,49 +1,42 @@
 {
   "project_info": {
-    "project_id": "muhasabah-apps",
-    "project_number": "191438625878",
-    "name": "Muhasabah Apps"
+    "project_number": "839290196692",
+    "project_id": "muhasabah-apps-eed59"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:191438625878:android:d705c2943efc7af4",
-        "client_id": "android:com.tsalatsah.muhasabahapps",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:839290196692:android:d705c2943efc7af4",
         "android_client_info": {
-          "package_name": "com.tsalatsah.muhasabahapps",
-          "certificate_hash": []
+          "package_name": "com.tsalatsah.muhasabahapps"
         }
       },
       "oauth_client": [
         {
-          "client_id": "191438625878-dtsli9otj24oea9snl14c9461cidq7fd.apps.googleusercontent.com",
+          "client_id": "839290196692-2cks5kave5e8nn7s06qr14ifrorh89ak.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.tsalatsah.muhasabahapps",
-            "certificate_hash": "5C6959988E33BFF7936FBC59431ED483528F9DC4"
+            "certificate_hash": "70BEF04BB17203E65A7396E9B5B1900C6F2207A1"
           }
         },
         {
-          "client_id": "191438625878-kpio98omuu9sh3hjc8bt3lamraodhpcf.apps.googleusercontent.com",
+          "client_id": "839290196692-3gnraldv7jjidd68ocf4694a4fda9n26.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU_k-9wVZS1Xn_dumfQDzt5gMhryX5TYQ"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
         },
-        "cloud_messaging_service": {
-          "status": 1,
-          "apns_config": []
-        },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 2
         },
         "ads_service": {
           "status": 1
@@ -51,6 +44,5 @@
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

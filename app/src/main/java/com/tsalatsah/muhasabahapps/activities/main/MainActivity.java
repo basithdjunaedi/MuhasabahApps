@@ -15,14 +15,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
+import com.tsalatsah.muhasabahapps.activities.category.DetailCategory;
 import com.tsalatsah.muhasabahapps.activities.category.NewCategoryActivity;
 import com.tsalatsah.muhasabahapps.api.CategoryApi;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
@@ -69,22 +72,36 @@ public class MainActivity extends AppCompatActivity
         CategoryApi categoryApi = new CategoryApi(getApplicationContext());
 
         Log.d(TAG, "get category from server called...");
+        Snackbar.make(fab, "Load categories...", Snackbar.LENGTH_SHORT)
+                .show();
+
         categoryApi.get(new JsonHttpResponseHandler(){
             @Override
             public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
-                Snackbar
-                        .make(fab, "Load categories...", Snackbar.LENGTH_SHORT)
-                        .show();
-
                 Log.d(TAG, "load categories...");
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
                 ListView categoryList = (ListView) findViewById(R.id.categoryList);
                 adapter.setJSONResponse(response);
                 adapter.notifyDataSetChanged();
                 categoryList.setAdapter(adapter);
+                categoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        try{
+                            Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
+                            String detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
+                            intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+
+                            startActivity(intent);
+                        }
+                        catch (JSONException e) {
+                            // who cares?
+                        }
+                    }
+                });
                 Log.d(TAG, "response -> " + response.toString());
             }
         });

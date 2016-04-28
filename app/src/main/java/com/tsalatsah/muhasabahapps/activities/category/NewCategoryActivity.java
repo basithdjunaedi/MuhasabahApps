@@ -4,13 +4,19 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -21,19 +27,26 @@ import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
 import com.tsalatsah.muhasabahapps.api.CategoryApi;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpResponse;
 
-public class NewCategoryActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener, TextView.OnEditorActionListener
+public class NewCategoryActivity extends AppCompatActivity implements View.OnClickListener
 {
     private final String TAG = NewCategoryActivity.class.getSimpleName();
     private CheckBox subCategoryCheckBox;
-    private Button submitButton;
-    private EditText categoryNameEditText;
-    private RadioGroup radioGroup;
-    private RadioButton checkerTypeRadio, counterTypeRadio;
+    private RadioButton checkerRadioButton, counterRadioButton;
+    private Button submitButton, addRecordButton, cancelRecordButton, saveRecordButton;
+    private EditText categoryNameEditText, recordNameEditText;
+    private LinearLayout linearLayout;
+    private LayoutInflater inflater;
+    private View contentView;
+    private PopupWindow popupWindow;
+    private JSONObject dataPost; // data to send to the server for creating new category
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,6 +59,9 @@ public class NewCategoryActivity extends AppCompatActivity implements View.OnCli
 
         submitButton = (Button) findViewById(R.id.btnSubmit);
         submitButton.setOnClickListener(this);
+
+        addRecordButton = (Button) findViewById(R.id.btnAddRecord);
+        addRecordButton.setOnClickListener(this);
 
         categoryNameEditText = (EditText) findViewById(R.id.editTextCategoryName);
         categoryNameEditText.setOnClickListener(this);
@@ -64,12 +80,45 @@ public class NewCategoryActivity extends AppCompatActivity implements View.OnCli
             }
         });
 
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
-        checkerTypeRadio = (RadioButton) findViewById(R.id.radioCheckerType);
-        counterTypeRadio = (RadioButton) findViewById(R.id.radioCounterType);
+        linearLayout = (LinearLayout) findViewById(R.id.linierLayout);
 
-        checkerTypeRadio.setOnClickListener(this);
-        counterTypeRadio.setOnClickListener(this);
+        dataPost = new JSONObject();
+
+        preparePopupWindow();
+    }
+
+    private void preparePopupWindow()
+    {
+        inflater = LayoutInflater.from(this);
+        contentView = inflater.inflate(R.layout.popup_new_category, null);
+        popupWindow = new PopupWindow(contentView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setFocusable(true);
+
+        cancelRecordButton = (Button) contentView.findViewById(R.id.btnCancel);
+        saveRecordButton = (Button) contentView.findViewById(R.id.btnSave);
+        checkerRadioButton = (RadioButton) contentView.findViewById(R.id.checkerRadioButton);
+        counterRadioButton = (RadioButton) contentView.findViewById(R.id.counterRadioButton);
+
+        recordNameEditText = (EditText) contentView.findViewById(R.id.recordNameEditText);
+        // add listener to the views
+        cancelRecordButton.setOnClickListener(this);
+        saveRecordButton.setOnClickListener(this);
+        checkerRadioButton.setOnClickListener(this);
+        counterRadioButton.setOnClickListener(this);
+        recordNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkIfTheRecordFormCompleted();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
 
@@ -80,78 +129,127 @@ public class NewCategoryActivity extends AppCompatActivity implements View.OnCli
 
         switch (id) {
             case R.id.checkBoxSubCategory:
-                toggleTheRecordTypeForm();
+                toggleTheRecordsForm();
                 break;
             case R.id.btnSubmit:
                 callApiToCreateNewCategory();
                 break;
+            case R.id.btnAddRecord:
+                displayNewRecordPopup();
+                break;
+            case R.id.btnCancel:
+                dismissPopupWindow();
+                break;
+            case R.id.btnSave:
+                saveNewRecordLocally();
         }
 
         checkIfTheFormCompleted();
+        checkIfTheRecordFormCompleted();
+    }
+
+    private void saveNewRecordLocally() {
+        // get the text
+        String recordName = recordNameEditText.getText().toString();
+        String recordType = counterRadioButton.isChecked() ? "counter" : "checker";
+        // create new view from layout
+        View view = inflater.inflate(R.layout.list_ordinary_record, null);
+        TextView recordNameTextView = (TextView) view.findViewById(R.id.recordName);
+        TextView recordTypeTextView = (TextView) view.findViewById(R.id.recordType);
+        recordNameTextView.setText(recordName);
+        recordTypeTextView.setText(recordType);
+        // get the records container
+        LinearLayout recordContainer = (LinearLayout) findViewById(R.id.recordsContainer);
+        recordContainer.addView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // save record data to the json
+        JSONArray dataRecords;
+        try {
+            dataRecords = dataPost.getJSONArray("records");
+        } catch (JSONException e) {
+            try {
+                dataPost.put("records", new JSONArray());
+            } catch (JSONException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        try {
+            dataRecords = dataPost.getJSONArray("records");
+
+            JSONObject newRecord = new JSONObject();
+            newRecord.put("name", recordName);
+            newRecord.put("type", recordType);
+
+            dataRecords.put(newRecord.toString());
+
+            dataPost.put("records", dataRecords);
+        }
+        catch (JSONException json) {
+            json.printStackTrace();
+        }
+
+        dismissPopupWindow();
+        // clear the form
+        recordNameEditText.setText("");
+    }
+
+    private void dismissPopupWindow()
+    {
+        popupWindow.dismiss();
+    }
+
+    private void displayNewRecordPopup()
+    {
+        popupWindow.showAtLocation(linearLayout, Gravity.CENTER, 0, 0);
     }
 
     private void callApiToCreateNewCategory()
     {
-        Log.d(TAG, "opo iki");
+        try {
+            dataPost.put("name", categoryNameEditText.getText().toString() );
+        } catch (JSONException e) {
+        }
+        Log.d(TAG, dataPost.toString());
         CategoryApi categoryApi = new CategoryApi(getApplicationContext());
         final Snackbar snackbar = Snackbar.make(submitButton, "Loading...", Snackbar.LENGTH_INDEFINITE);
 
-        categoryApi.newCategory(categoryNameEditText.getText().toString(), getTypeValue(), new AsyncHttpResponseHandler(){
-            @Override
-            public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
-                snackbar.show();
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Log.d(TAG, new String(responseBody));
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.d(TAG, new String(responseBody));
-            }
-        });
+//        categoryApi.newCategory(categoryNameEditText.getText().toString(), getTypeValue(), new AsyncHttpResponseHandler(){
+//            @Override
+//            public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
+//                snackbar.show();
+//            }
+//
+//            @Override
+//            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+//                Log.d(TAG, new String(responseBody));
+//            }
+//
+//            @Override
+//            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+//                Log.d(TAG, new String(responseBody));
+//            }
+//        });
     }
 
-    private void toggleTheRecordTypeForm()
+    private void toggleTheRecordsForm()
     {
-        if (subCategoryCheckBox.isChecked()) {
-            radioGroup.setVisibility(View.VISIBLE);
+        if (!subCategoryCheckBox.isChecked()) {
+            linearLayout.setVisibility(View.VISIBLE);
         }
         else {
-            radioGroup.setVisibility(View.INVISIBLE);
+            linearLayout.setVisibility(View.INVISIBLE);
         }
-    }
-
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event)
-    {
-        int action = event.getAction();
-
-        Log.d(TAG, "There is a key action");
-        switch (action) {
-            case KeyEvent.ACTION_UP:
-                checkIfTheFormCompleted();
-                Log.d(TAG, "action up");
-                break;
-        }
-
-        return false;
     }
 
     private void checkIfTheFormCompleted()
     {
-        if (!ifCategoryNameEmpty() && ((ifSubCategoryChecked() && ifRadioGroupSelected()) || !ifSubCategoryChecked())) {
+        if (!ifCategoryNameEmpty()) {
             submitButton.setEnabled(true);
         }
         else {
             submitButton.setEnabled(false);
         }
-    }
-
-    private boolean ifRadioGroupSelected() {
-        return checkerTypeRadio.isChecked() || counterTypeRadio.isChecked();
     }
 
     private boolean ifCategoryNameEmpty()
@@ -164,19 +262,17 @@ public class NewCategoryActivity extends AppCompatActivity implements View.OnCli
         return subCategoryCheckBox.isChecked();
     }
 
-    @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        checkIfTheFormCompleted();
-        Log.d(TAG, "On editor action fired!");
+    private boolean checkIfTheRecordFormCompleted()
+    {
+        if (recordNameEditText.length() > 0 && (checkerRadioButton.isChecked() || counterRadioButton.isChecked())) {
+            saveRecordButton.setEnabled(true);
+
+            return true;
+        }
+
+        saveRecordButton.setEnabled(false);
+
         return false;
     }
 
-    private String getTypeValue()
-    {
-        if (ifRadioGroupSelected()) {
-            return checkerTypeRadio.isChecked() ? "checker" : "counter";
-        }
-
-        return null;
-    }
 }
