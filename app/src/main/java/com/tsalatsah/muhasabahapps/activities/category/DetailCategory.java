@@ -3,10 +3,13 @@ package com.tsalatsah.muhasabahapps.activities.category;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.tsalatsah.muhasabahapps.R;
 import com.tsalatsah.muhasabahapps.api.CategoryApi;
@@ -25,11 +28,14 @@ public class DetailCategory extends AppCompatActivity {
     private SubCategoryAdapter subCategoryAdapter;
     private RecordAdapter recordAdapter;
     private TextView loadingText;
+    private CategoryApi categoryApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_category);
+
+        categoryApi = new CategoryApi(this);
 
         try {
             category = new JSONObject(getIntent().getExtras().getString(EXTRA_CATEGORY));
@@ -59,7 +65,6 @@ public class DetailCategory extends AppCompatActivity {
 
         Log.d(TAG, "hasSubCategory -> " + hasSubCategory);
 
-        CategoryApi categoryApi = new CategoryApi(getApplicationContext());
         categoryApi.getCategoryDetail(category.getInt("id"), new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -104,5 +109,40 @@ public class DetailCategory extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_detail_category, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_delete_category:
+                callApiToDeleteThisCategory();
+                break;
+        }
+
+        return true;
+    }
+
+    private void callApiToDeleteThisCategory() {
+        try {
+            categoryApi.deteleCategory(category.getInt("id"), new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    finish();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.d(TAG, new String(responseBody));
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }
