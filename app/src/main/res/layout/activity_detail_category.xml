@@ -24,4 +24,13 @@
         android:layout_below="@+id/loadingText">
     </ListView>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btnAddNewSub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        android:src="@android:drawable/ic_input_add"/>
+
 </RelativeLayout>
