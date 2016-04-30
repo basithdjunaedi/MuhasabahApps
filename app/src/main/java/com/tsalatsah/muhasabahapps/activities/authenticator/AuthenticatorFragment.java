@@ -163,6 +163,7 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
             }
         }
         else {
+            result.getStatus();
             Log.d(TAG, "login gagal");
         }
     }
