@@ -97,9 +97,10 @@ public class CategoryApi extends Api{
                         };
 
                         if (token != null) {
+                            RequestParams params = new RequestParams();
                             try {
                                 // aku wes bingung. Iki gak work kabeh
-
+                                params.put("name", dataPost.getString("name"));
                                 List <Map<String, String>> records = new ArrayList<Map<String, String>>();
 
                                 for (int i = 0; i < dataPost.getJSONArray("records").length(); i++) {
@@ -111,19 +112,14 @@ public class CategoryApi extends Api{
                                     records.add(map);
                                 }
 
-                                RequestParams params = new RequestParams();
                                 params.put("records", records);
-                                params.put("name", dataPost.getString("name"));
-
-                                Log.d(TAG, "params encoded -> " + URLEncoder.encode(params.toString(), "UTF-8"));
-                                Log.d(TAG, "params decoded -> " + params.toString());
-                                client.post(Api.CATEGORY_NEW_URL + "?token=" + token, params, handler);
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
                             }
+
+                            Log.d(TAG, "params decoded -> " + params.toString());
+                            client.post(Api.CATEGORY_NEW_URL + "?token=" + token, params, handler);
                         }
                     }
                 }, null);

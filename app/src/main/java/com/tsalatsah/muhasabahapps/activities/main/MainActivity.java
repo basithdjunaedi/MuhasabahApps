@@ -72,13 +72,12 @@ public class MainActivity extends AppCompatActivity
         CategoryApi categoryApi = new CategoryApi(getApplicationContext());
 
         Log.d(TAG, "get category from server called...");
-        Snackbar.make(fab, "Load categories...", Snackbar.LENGTH_SHORT)
-                .show();
+        final Snackbar snackbar = Snackbar.make(fab, "Load categories...", Snackbar.LENGTH_INDEFINITE);
 
         categoryApi.get(new JsonHttpResponseHandler(){
             @Override
-            public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
-                Log.d(TAG, "load categories...");
+            public void onStart() {
+                snackbar.show();
             }
 
             @Override
@@ -102,7 +101,8 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 });
-                Log.d(TAG, "response -> " + response.toString());
+
+                Snackbar.make(fab, "Kategori telah dimuat", Snackbar.LENGTH_SHORT).show();
             }
         });
     }
