@@ -29,6 +29,7 @@ public class DetailCategory extends AppCompatActivity {
     private RecordAdapter recordAdapter;
     private TextView loadingText;
     private CategoryApi categoryApi;
+    boolean hasSubCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +62,7 @@ public class DetailCategory extends AppCompatActivity {
         * Tetapi yang memiliki sub-kategori, maka yang ditampilkan adalah sub kategorinya...
         * */
 
-        final boolean hasSubCategory = category.getBoolean("has_sub_category");
-
-        Log.d(TAG, "hasSubCategory -> " + hasSubCategory);
+        hasSubCategory = category.getBoolean("has_sub_category");
 
         categoryApi.getCategoryDetail(category.getInt("id"), new JsonHttpResponseHandler(){
             @Override
@@ -104,7 +103,6 @@ public class DetailCategory extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Log.d(TAG, "response -> " + response.toString());
             }
         });
     }
