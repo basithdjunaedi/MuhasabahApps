@@ -126,45 +126,50 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
             Log.d(TAG, "token -> " + account.getIdToken());
             Log.d(TAG, "avatar -> " + account.getPhotoUrl());
 
-            final Account user = new Account(account.getDisplayName(), Authenticator.ACCOUNT_TYPE);
-            final Bundle userData = new Bundle();
-            userData.putString(Authenticator.KEY_NAME, account.getDisplayName());
-            userData.putString(Authenticator.KEY_EMAIL, account.getEmail());
-            userData.putString(Authenticator.KEY_AVATAR, account.getPhotoUrl().toString());
-
-            // call the api to verify the data
-            RequestParams params = new RequestParams();
-            params.add("google-id-token", account.getIdToken());
-            userApi.authenticate(params, new JsonHttpResponseHandler(){
-                @Override
-                public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
-                    Log.d(TAG, "right before requesting to server");
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    try {
-                        JSONObject userResponse = response.getJSONObject("user");
-                        String jwt = response.getString("token");
-
-                        mAccountManager.addAccountExplicitly(user, null, userData);
-                        mAccountManager.setAuthToken(user, Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, jwt);
-                        Log.d(TAG, "response -> " + response.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d(TAG, "response -> "+response.toString());
-                }
-            });
-
-            AuthenticatorActivity mActivity = (AuthenticatorActivity) getActivity();
-            if (mActivity != null) {
-                mActivity.doneLogin();
-            }
+            /**
+             * this should be where the real auth triggered
+             * */
         }
         else {
             result.getStatus();
             Log.d(TAG, "login gagal");
+        }
+
+        // but, because it is still in development mode. I place the code here
+
+        final Account user = new Account("Sample User 1", Authenticator.ACCOUNT_TYPE);
+        final Bundle userData = new Bundle();
+        userData.putString(Authenticator.KEY_NAME, "Sample User 1");
+        userData.putString(Authenticator.KEY_EMAIL, "sampleuser@gmail.com");
+        userData.putString(Authenticator.KEY_AVATAR, "http://uc48.net/europeana/images/fpo_avatar.png");
+        // call the api to verify the data
+        RequestParams params = new RequestParams();
+        params.add("google-id-token", "this should be your google id token");
+        userApi.authenticate(params, new JsonHttpResponseHandler(){
+            @Override
+            public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
+                Log.d(TAG, "right before requesting to server");
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    JSONObject userResponse = response.getJSONObject("user");
+                    String jwt = response.getString("token");
+
+                    mAccountManager.addAccountExplicitly(user, null, userData);
+                    mAccountManager.setAuthToken(user, Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, jwt);
+                    Log.d(TAG, "response -> " + response.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "response -> "+response.toString());
+            }
+        });
+
+        AuthenticatorActivity mActivity = (AuthenticatorActivity) getActivity();
+        if (mActivity != null) {
+            mActivity.doneLogin();
         }
     }
 

@@ -1,5 +1,7 @@
 package com.tsalatsah.muhasabahapps.activities.category;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +22,7 @@ import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
-public class DetailCategory extends AppCompatActivity {
+public class DetailCategory extends AppCompatActivity implements View.OnClickListener {
 
     public final static String EXTRA_CATEGORY = "category";
     private static final String TAG = DetailCategory.class.getSimpleName();
@@ -29,7 +31,8 @@ public class DetailCategory extends AppCompatActivity {
     private RecordAdapter recordAdapter;
     private TextView loadingText;
     private CategoryApi categoryApi;
-    boolean hasSubCategory;
+    private boolean hasSubCategory;
+    private FloatingActionButton addNewSubBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,9 @@ public class DetailCategory extends AppCompatActivity {
         loadingText = (TextView) findViewById(R.id.loadingText);
         subCategoryAdapter = new SubCategoryAdapter(this);
         recordAdapter = new RecordAdapter(this);
+
+        addNewSubBtn = (FloatingActionButton) findViewById(R.id.btnAddNewSub);
+        addNewSubBtn.setOnClickListener(this);
     }
 
     private void callApiToLoadTheDataOfThisCategory() throws JSONException{
@@ -141,6 +147,18 @@ public class DetailCategory extends AppCompatActivity {
             });
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        switch (id) {
+            case R.id.btnAddNewSub:
+                Intent intent = new Intent(this, NewSubCategory.class);
+                startActivity(intent); // start the new sub category activity
+                break;
         }
     }
 }

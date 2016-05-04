@@ -45,8 +45,10 @@
             android:parentActivityName=".activities.main.MainActivity" />
         <activity
             android:name=".activities.category.DetailCategory"
-            android:parentActivityName=".activities.main.MainActivity">
-        </activity>
+            android:parentActivityName=".activities.main.MainActivity"></activity>
+        <activity android:name=".activities.category.NewSubCategory"
+            android:label="Sub Kategori Baru"
+            android:parentActivityName=".activities.category.DetailCategory"></activity>
     </application>
 
 </manifest>
