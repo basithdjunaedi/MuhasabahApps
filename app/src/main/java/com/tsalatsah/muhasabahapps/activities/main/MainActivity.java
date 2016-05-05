@@ -117,10 +117,25 @@ public class MainActivity extends AppCompatActivity
                     JSONArray categories = response.getJSONArray("categories");
                     for (int i = 0; i < categories.length(); i++) {
                         JSONObject category = categories.getJSONObject(i);
+                        final int position = i;
 
                         View view = inflater.inflate(R.layout.card_view, null);
                         TextView textView = (TextView) view.findViewById(R.id.card_view_text);
                         textView.setText(category.getString("name"));
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
+                                String detailCategory = null;
+                                try {
+                                    detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+                                startActivity(intent);
+                            }
+                        });
                         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                         categoriesContainer.addView(view, layoutParams);
                     }
