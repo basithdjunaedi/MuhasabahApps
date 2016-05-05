@@ -35,17 +35,13 @@
         </com.github.florent37.parallax.ParallaxView>
 
         <LinearLayout
+            android:id="@+id/categoriesContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="190dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
-
-            <ListView
-                android:id="@+id/categoryList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"></ListView>
 
         </LinearLayout>
     </FrameLayout>

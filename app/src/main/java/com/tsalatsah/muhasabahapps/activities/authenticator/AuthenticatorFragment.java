@@ -114,6 +114,8 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
+        final AuthenticatorActivity mActivity = (AuthenticatorActivity) getActivity();
+
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
             Toast
@@ -136,7 +138,6 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
         }
 
         // but, because it is still in development mode. I place the code here
-
         final Account user = new Account("Sample User 1", Authenticator.ACCOUNT_TYPE);
         final Bundle userData = new Bundle();
         userData.putString(Authenticator.KEY_NAME, "Sample User 1");
@@ -164,13 +165,11 @@ public class AuthenticatorFragment extends Fragment implements View.OnClickListe
                     e.printStackTrace();
                 }
                 Log.d(TAG, "response -> "+response.toString());
+                if (mActivity != null) {
+                    mActivity.doneLogin();
+                }
             }
         });
-
-        AuthenticatorActivity mActivity = (AuthenticatorActivity) getActivity();
-        if (mActivity != null) {
-            mActivity.doneLogin();
-        }
     }
 
     @Override
