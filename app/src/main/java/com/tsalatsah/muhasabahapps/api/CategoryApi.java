@@ -38,150 +38,116 @@ public class CategoryApi extends Api{
 
     private Context context;
     private final String TAG = CategoryApi.class.getSimpleName();
+    private String token = null;
+    private  AccountManager accountManager;
 
     public CategoryApi(Context context)
     {
         this.context = context;
+
+        withToken(null);
     }
 
     public void get(final AsyncHttpResponseHandler handler)
     {
-        // get the token from AccontManager
-        AccountManager accountManager = AccountManager.get(context);
+        withToken(new Runnable() {
+            @Override
+            public void run() {
+                RequestParams params = new RequestParams();
+                params.add("token", token);
 
-        accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
-                Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        String token = null;
-                        try {
-                            token = future.getResult().getString("authtoken");
-                        } catch (OperationCanceledException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (AuthenticatorException e) {
-                            e.printStackTrace();
-                        };
-
-                        if (token != null) {
-                            RequestParams params = new RequestParams();
-                            params.add("token", token);
-
-                            client.get(CATEGORY_GET_URL, params, handler);
-                        }
-                    }
-                }, null);
+                client.get(CATEGORY_GET_URL, params, handler);
+            }
+        });
     }
 
     public void newCategory(final JSONObject dataPost, final AsyncHttpResponseHandler handler)
     {
-        // get the token from AccontManager
-        AccountManager accountManager = AccountManager.get(context);
+        withToken(new Runnable() {
+            @Override
+            public void run() {
+                RequestParams params = new RequestParams();
+                try {
+                    // aku wes bingung. Iki gak work kabeh
+                    params.put("name", dataPost.getString("name"));
+                    List <Map<String, String>> records = new ArrayList<Map<String, String>>();
 
-        accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
-                Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        String token = null;
-                        try {
-                            token = future.getResult().getString("authtoken");
-                        } catch (OperationCanceledException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (AuthenticatorException e) {
-                            e.printStackTrace();
-                        };
+                    for (int i = 0; i < dataPost.getJSONArray("records").length(); i++) {
+                        JSONArray jsonArray = dataPost.getJSONArray("records");
+                        JSONObject record = new JSONObject(jsonArray.getString(i));
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("name", record.getString("name"));
+                        map.put("type", record.getString("type"));
+                        records.add(map);
+                    }
 
-                        if (token != null) {
-                            RequestParams params = new RequestParams();
+                    params.put("records", records);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d(TAG, "params decoded -> " + params.toString());
+                client.post(Api.CATEGORY_NEW_URL + "?token=" + token, params, handler);
+            }
+        });
+    }
+
+    public void getCategoryDetail(final int id, final AsyncHttpResponseHandler handler)
+    {
+        withToken(new Runnable() {
+            @Override
+            public void run() {
+                RequestParams params = new RequestParams();
+                params.put("token", token);
+
+                client.get(Api.CATEGORY_SHOW_URL+id, params, handler);
+            }
+        });
+    }
+
+    public void deteleCategory(final int categoryId, final AsyncHttpResponseHandler handler)
+    {
+        withToken(new Runnable() {
+            @Override
+            public void run() {
+                RequestParams params = new RequestParams();
+                params.put("_method", "delete");
+
+                client.post(Api.CATEGORY_SHOW_URL+categoryId + "?token="+token, params, handler);
+            }
+        });
+    }
+
+    private void withToken(final Runnable callback)
+    {
+        if (token == null) {
+            accountManager = AccountManager.get(context);
+            accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
+                    Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
+                    new AccountManagerCallback<Bundle>() {
+                        @Override
+                        public void run(AccountManagerFuture<Bundle> future) {
                             try {
-                                // aku wes bingung. Iki gak work kabeh
-                                params.put("name", dataPost.getString("name"));
-                                List <Map<String, String>> records = new ArrayList<Map<String, String>>();
-
-                                for (int i = 0; i < dataPost.getJSONArray("records").length(); i++) {
-                                    JSONArray jsonArray = dataPost.getJSONArray("records");
-                                    JSONObject record = new JSONObject(jsonArray.getString(i));
-                                    HashMap<String, String> map = new HashMap<String, String>();
-                                    map.put("name", record.getString("name"));
-                                    map.put("type", record.getString("type"));
-                                    records.add(map);
-                                }
-
-                                params.put("records", records);
-
-                            } catch (JSONException e) {
+                                token = future.getResult().getString("authtoken");
+                                if (callback != null)
+                                    callback.run();
+                            } catch (OperationCanceledException e) {
                                 e.printStackTrace();
-                            }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (AuthenticatorException e) {
+                                e.printStackTrace();
+                            };
 
-                            Log.d(TAG, "params decoded -> " + params.toString());
-                            client.post(Api.CATEGORY_NEW_URL + "?token=" + token, params, handler);
+                            Log.d(TAG, "CALLING AUTHMANAGER");
                         }
-                    }
-                }, null);
-    }
 
-    public void getCategoryDetail(final int id, final AsyncHttpResponseHandler handler) {
-        // get the token from AccontManager
-        AccountManager accountManager = AccountManager.get(context);
-
-        accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
-                Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        String token = null;
-                        try {
-                            token = future.getResult().getString("authtoken");
-                        } catch (OperationCanceledException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (AuthenticatorException e) {
-                            e.printStackTrace();
-                        };
-
-                        if (token != null) {
-                            RequestParams params = new RequestParams();
-                            params.put("token", token);
-
-                            client.get(Api.CATEGORY_SHOW_URL+id, params, handler);
-                        }
-                    }
-                }, null);
-    }
-
-    public void deteleCategory(final int categoryId, final AsyncHttpResponseHandler handler) {
-        // get the token from AccontManager
-        AccountManager accountManager = AccountManager.get(context);
-
-        accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
-                Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
-                new AccountManagerCallback<Bundle>() {
-                    @Override
-                    public void run(AccountManagerFuture<Bundle> future) {
-                        String token = null;
-                        try {
-                            token = future.getResult().getString("authtoken");
-                        } catch (OperationCanceledException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (AuthenticatorException e) {
-                            e.printStackTrace();
-                        };
-
-                        if (token != null) {
-                            RequestParams params = new RequestParams();
-                            params.put("_method", "delete");
-
-                            client.post(Api.CATEGORY_SHOW_URL+categoryId + "?token="+token, params, handler);
-                        }
-                    }
-                }, null);
+                    }, null);
+        }
+        else {
+            if (callback != null)
+               callback.run();
+        }
     }
 }

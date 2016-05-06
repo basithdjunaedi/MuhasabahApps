@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     private CustomListAdapter adapter;
     private LinearLayout categoriesContainer;
     private LayoutInflater inflater;
+    private CategoryApi categoryApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        categoryApi = new CategoryApi(this);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -80,9 +83,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getCategoryFromServer() {
-        CategoryApi categoryApi = new CategoryApi(getApplicationContext());
-
-        Log.d(TAG, "get category from server called...");
+                Log.d(TAG, "get category from server called...");
         final Snackbar snackbar = Snackbar.make(fab, "Load categories...", Snackbar.LENGTH_INDEFINITE);
 
         categoryApi.get(new JsonHttpResponseHandler(){
@@ -93,26 +94,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
-//                ListView categoryList = (ListView) findViewById(R.id.categoryList);
-//                adapter.setJSONResponse(response);
-//                adapter.notifyDataSetChanged();
-//                categoryList.setAdapter(adapter);
-//                categoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                        try{
-//                            Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
-//                            String detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
-//                            intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
-//
-//                            startActivity(intent);
-//                        }
-//                        catch (JSONException e) {
-//                            // who cares?
-//                        }
-//                    }
-//                });
-
                 try {
                     JSONArray categories = response.getJSONArray("categories");
                     for (int i = 0; i < categories.length(); i++) {
@@ -144,6 +125,11 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 Snackbar.make(fab, "Kategori telah dimuat", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d(TAG, responseString);
             }
         });
     }
