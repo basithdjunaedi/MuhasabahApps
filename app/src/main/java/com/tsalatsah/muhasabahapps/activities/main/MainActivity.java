@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,8 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
@@ -25,6 +29,7 @@ import com.tsalatsah.muhasabahapps.activities.category.DetailCategory;
 import com.tsalatsah.muhasabahapps.activities.category.NewCategoryActivity;
 import com.tsalatsah.muhasabahapps.api.CategoryApi;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,9 +40,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    AccountManager accountManager;
-    FloatingActionButton fab;
-    CustomListAdapter adapter;
+    private AccountManager accountManager;
+    private FloatingActionButton fab;
+    private CustomListAdapter adapter;
+    private LinearLayout categoriesContainer;
+    private LayoutInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +73,10 @@ public class MainActivity extends AppCompatActivity
 
         adapter = new CustomListAdapter(this);
         getCategoryFromServer();
+
+        categoriesContainer = (LinearLayout) findViewById(R.id.categoriesContainer);
+
+        inflater = LayoutInflater.from(this);
     }
 
     private void getCategoryFromServer() {
@@ -82,25 +93,55 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
-                ListView categoryList = (ListView) findViewById(R.id.categoryList);
-                adapter.setJSONResponse(response);
-                adapter.notifyDataSetChanged();
-                categoryList.setAdapter(adapter);
-                categoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        try{
-                            Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
-                            String detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
-                            intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+//                ListView categoryList = (ListView) findViewById(R.id.categoryList);
+//                adapter.setJSONResponse(response);
+//                adapter.notifyDataSetChanged();
+//                categoryList.setAdapter(adapter);
+//                categoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                        try{
+//                            Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
+//                            String detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
+//                            intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+//
+//                            startActivity(intent);
+//                        }
+//                        catch (JSONException e) {
+//                            // who cares?
+//                        }
+//                    }
+//                });
 
-                            startActivity(intent);
-                        }
-                        catch (JSONException e) {
-                            // who cares?
-                        }
+                try {
+                    JSONArray categories = response.getJSONArray("categories");
+                    for (int i = 0; i < categories.length(); i++) {
+                        JSONObject category = categories.getJSONObject(i);
+                        final int position = i;
+
+                        View view = inflater.inflate(R.layout.card_view, null);
+                        TextView textView = (TextView) view.findViewById(R.id.card_view_text);
+                        textView.setText(category.getString("name"));
+                        textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
+                                String detailCategory = null;
+                                try {
+                                    detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+                                startActivity(intent);
+                            }
+                        });
+                        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        categoriesContainer.addView(view, layoutParams);
                     }
-                });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
                 Snackbar.make(fab, "Kategori telah dimuat", Snackbar.LENGTH_SHORT).show();
             }
