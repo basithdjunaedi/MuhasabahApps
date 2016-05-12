@@ -45,10 +45,20 @@
             android:parentActivityName=".activities.main.MainActivity" />
         <activity
             android:name=".activities.category.DetailCategory"
-            android:parentActivityName=".activities.main.MainActivity"></activity>
-        <activity android:name=".activities.category.NewSubCategory"
+            android:parentActivityName=".activities.main.MainActivity" />
+        <activity
+            android:name=".activities.category.NewSubCategory"
             android:label="Sub Kategori Baru"
-            android:parentActivityName=".activities.category.DetailCategory"></activity>
+            android:parentActivityName=".activities.category.DetailCategory" />
+        <!--
+ ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".activities.category.SubCategoryDetailActivity"></activity>
     </application>
 
 </manifest>

@@ -25,6 +25,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
+import com.tsalatsah.muhasabahapps.activities.main.MainActivity;
 import com.tsalatsah.muhasabahapps.api.CategoryApi;
 
 import org.json.JSONArray;
@@ -226,6 +227,7 @@ public class NewCategoryActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 snackbar.make(submitButton, "Kategori berhasil dibuat", Snackbar.LENGTH_SHORT).show();
+                MainActivity.loadCategory = true;
                 finish();
             }
 

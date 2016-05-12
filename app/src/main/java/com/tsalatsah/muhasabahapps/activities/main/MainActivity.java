@@ -1,10 +1,15 @@
 package com.tsalatsah.muhasabahapps.activities.main;
 
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
@@ -45,6 +53,10 @@ public class MainActivity extends AppCompatActivity
     private CustomListAdapter adapter;
     private LinearLayout categoriesContainer;
     private LayoutInflater inflater;
+    private CategoryApi categoryApi;
+    private Context mContext;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public static boolean loadCategory = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        categoryApi = new CategoryApi(this);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -72,20 +86,36 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         adapter = new CustomListAdapter(this);
-        getCategoryFromServer();
-
         categoriesContainer = (LinearLayout) findViewById(R.id.categoriesContainer);
 
         inflater = LayoutInflater.from(this);
+        mContext = this;
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.RED, Color.GREEN, Color.GRAY);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getCategoryFromServer();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (loadCategory) {
+            getCategoryFromServer();
+            loadCategory = false;
+        }
     }
 
     private void getCategoryFromServer() {
-        CategoryApi categoryApi = new CategoryApi(getApplicationContext());
-
         Log.d(TAG, "get category from server called...");
         final Snackbar snackbar = Snackbar.make(fab, "Load categories...", Snackbar.LENGTH_INDEFINITE);
 
-        categoryApi.get(new JsonHttpResponseHandler(){
+        categoryApi.get(new JsonHttpResponseHandler() {
             @Override
             public void onStart() {
                 snackbar.show();
@@ -93,31 +123,11 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
-//                ListView categoryList = (ListView) findViewById(R.id.categoryList);
-//                adapter.setJSONResponse(response);
-//                adapter.notifyDataSetChanged();
-//                categoryList.setAdapter(adapter);
-//                categoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                        try{
-//                            Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
-//                            String detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
-//                            intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
-//
-//                            startActivity(intent);
-//                        }
-//                        catch (JSONException e) {
-//                            // who cares?
-//                        }
-//                    }
-//                });
-
                 try {
                     JSONArray categories = response.getJSONArray("categories");
+                    categoriesContainer.removeAllViews();
                     for (int i = 0; i < categories.length(); i++) {
-                        JSONObject category = categories.getJSONObject(i);
-                        final int position = i;
+                        final JSONObject category = categories.getJSONObject(i);
 
                         View view = inflater.inflate(R.layout.card_view, null);
                         TextView textView = (TextView) view.findViewById(R.id.card_view_text);
@@ -125,14 +135,11 @@ public class MainActivity extends AppCompatActivity
                         textView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
+                                Intent intent = new Intent(mContext, DetailCategory.class);
                                 String detailCategory = null;
-                                try {
-                                    detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                                detailCategory = category.toString();
                                 intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+                                Log.d(TAG, "extra -> " + detailCategory);
                                 startActivity(intent);
                             }
                         });
@@ -143,7 +150,13 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
+                swipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(fab, "Kategori telah dimuat", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d(TAG, responseString);
             }
         });
     }
