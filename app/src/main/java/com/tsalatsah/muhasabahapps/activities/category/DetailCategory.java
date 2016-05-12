@@ -1,5 +1,6 @@
 package com.tsalatsah.muhasabahapps.activities.category;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +36,8 @@ public class DetailCategory extends AppCompatActivity implements View.OnClickLis
     private CategoryApi categoryApi;
     private boolean hasSubCategory;
     private FloatingActionButton addNewSubBtn;
-    public static boolean loadCategoryFromServer = true;
+    public static boolean loadCategoryFromServer;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,10 @@ public class DetailCategory extends AppCompatActivity implements View.OnClickLis
 
         addNewSubBtn = (FloatingActionButton) findViewById(R.id.btnAddNewSub);
         addNewSubBtn.setOnClickListener(this);
+
+        loadCategoryFromServer = true;
+
+        mContext = this;
     }
 
     @Override
@@ -91,10 +98,26 @@ public class DetailCategory extends AppCompatActivity implements View.OnClickLis
                 if (hasSubCategory) {
                     try {
                         JSONObject responseCategory = response.getJSONObject("category");
-                        JSONArray subCategories = responseCategory.getJSONArray("sub_categories");
+                        final JSONArray subCategories = responseCategory.getJSONArray("sub_categories");
                         subCategoryAdapter.setData(subCategories);
                         subCategoryAdapter.notifyDataSetChanged();
                         listView.setAdapter(subCategoryAdapter);
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Intent intent = new Intent(mContext, SubCategoryDetailActivity.class);
+                                String subCategory = null;
+
+                                try {
+                                    subCategory = subCategories.getJSONObject(position).toString();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                intent.putExtra(SubCategoryDetailActivity.EXTRA_SUB_CATEGORY, subCategory);
+                                startActivity(intent);
+                            }
+                        });
 
                         // sembunyikan loading textnya jika panjang sub category lebih dari 0
                         if (subCategories.length() > 0)

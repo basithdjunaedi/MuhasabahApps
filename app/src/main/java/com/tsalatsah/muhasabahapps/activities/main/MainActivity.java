@@ -127,8 +127,7 @@ public class MainActivity extends AppCompatActivity
                     JSONArray categories = response.getJSONArray("categories");
                     categoriesContainer.removeAllViews();
                     for (int i = 0; i < categories.length(); i++) {
-                        JSONObject category = categories.getJSONObject(i);
-                        final int position = i;
+                        final JSONObject category = categories.getJSONObject(i);
 
                         View view = inflater.inflate(R.layout.card_view, null);
                         TextView textView = (TextView) view.findViewById(R.id.card_view_text);
@@ -138,12 +137,9 @@ public class MainActivity extends AppCompatActivity
                             public void onClick(View v) {
                                 Intent intent = new Intent(mContext, DetailCategory.class);
                                 String detailCategory = null;
-                                try {
-                                    detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                                detailCategory = category.toString();
                                 intent.putExtra(DetailCategory.EXTRA_CATEGORY, detailCategory);
+                                Log.d(TAG, "extra -> " + detailCategory);
                                 startActivity(intent);
                             }
                         });

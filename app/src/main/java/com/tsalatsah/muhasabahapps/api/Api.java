@@ -43,6 +43,11 @@ public class Api {
         return BASE_URL + "categories/" + categoryId + "/sub-categories/new";
     }
 
+    public static String getSubCategoryDetailURL(int categoryId, int subCategoryId)
+    {
+        return BASE_URL + "categories/" + categoryId + "/sub-categories/" + subCategoryId;
+    }
+
     protected void withToken(final Runnable callback)
     {
         if (token == null) {

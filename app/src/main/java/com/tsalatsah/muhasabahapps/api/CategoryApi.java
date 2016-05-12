@@ -141,4 +141,17 @@ public class CategoryApi extends Api{
             }
         });
     }
+
+    public void getSubCategoryDetail(final int categoryId, final int subCategoryId, final AsyncHttpResponseHandler handler)
+    {
+        withToken(new Runnable() {
+            @Override
+            public void run() {
+                RequestParams params = new RequestParams();
+                params.put("token", token);
+
+                client.get(Api.getSubCategoryDetailURL(categoryId, subCategoryId), params, handler);
+            }
+        });
+    }
 }
