@@ -36,16 +36,9 @@ import cz.msebera.android.httpclient.protocol.HTTP;
  */
 public class CategoryApi extends Api{
 
-    private Context context;
-    private final String TAG = CategoryApi.class.getSimpleName();
-    private String token = null;
-    private  AccountManager accountManager;
-
     public CategoryApi(Context context)
     {
-        this.context = context;
-
-        withToken(null);
+        super(context);
     }
 
     public void get(final AsyncHttpResponseHandler handler)
@@ -119,35 +112,33 @@ public class CategoryApi extends Api{
         });
     }
 
-    private void withToken(final Runnable callback)
-    {
-        if (token == null) {
-            accountManager = AccountManager.get(context);
-            accountManager.getAuthTokenByFeatures(Authenticator.ACCOUNT_TYPE,
-                    Authenticator.ACCOUNT_AUTH_TOKEN_TYPE, null, null, null, null,
-                    new AccountManagerCallback<Bundle>() {
-                        @Override
-                        public void run(AccountManagerFuture<Bundle> future) {
-                            try {
-                                token = future.getResult().getString("authtoken");
-                                if (callback != null)
-                                    callback.run();
-                            } catch (OperationCanceledException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (AuthenticatorException e) {
-                                e.printStackTrace();
-                            };
+    public void newSubCategory(final JSONObject dataPost, final AsyncHttpResponseHandler handler) {
+        withToken(new Runnable() {
+            @Override
+            public void run() {
+                RequestParams params = new RequestParams();
+                try {
+                    // aku wes bingung. Iki gak work kabeh
+                    params.put("name", dataPost.getString("name"));
+                    List <Map<String, String>> records = new ArrayList<Map<String, String>>();
 
-                            Log.d(TAG, "CALLING AUTHMANAGER");
-                        }
+                    for (int i = 0; i < dataPost.getJSONArray("records").length(); i++) {
+                        JSONArray jsonArray = dataPost.getJSONArray("records");
+                        JSONObject record = new JSONObject(jsonArray.getString(i));
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("name", record.getString("name"));
+                        map.put("type", record.getString("type"));
+                        records.add(map);
+                    }
 
-                    }, null);
-        }
-        else {
-            if (callback != null)
-               callback.run();
-        }
+                    params.put("records", records);
+                    Log.d(TAG, "params decoded -> " + params.toString());
+                    client.post(Api.getSubCategoryNewURL(dataPost.getInt("categoryId")) + "?token=" + token, params, handler);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

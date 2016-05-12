@@ -10,11 +10,9 @@ import com.loopj.android.http.RequestParams;
  */
 public class UserApi extends Api {
 
-    private Context mContext;
-
     public UserApi(Context context)
     {
-        mContext = context;
+        super(context);
     }
 
     public void authenticate(RequestParams params, AsyncHttpResponseHandler handler)

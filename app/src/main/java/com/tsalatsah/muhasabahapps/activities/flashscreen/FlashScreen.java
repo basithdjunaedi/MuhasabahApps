@@ -6,8 +6,10 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.tsalatsah.muhasabahapps.activities.main.MainActivity;
 import com.tsalatsah.muhasabahapps.R;
@@ -47,6 +49,7 @@ public class FlashScreen extends Activity implements Runnable
     private void checkTheLogin()
     {
         final Account accounts[] = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+
 
         Log.d(TAG, "accounts -> " + Arrays.toString(accounts));
         if (accounts.length < 1) {

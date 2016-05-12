@@ -1,10 +1,15 @@
 package com.tsalatsah.muhasabahapps.activities.main;
 
 import android.accounts.AccountManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.ResponseHandlerInterface;
 import com.tsalatsah.muhasabahapps.R;
@@ -46,6 +54,9 @@ public class MainActivity extends AppCompatActivity
     private LinearLayout categoriesContainer;
     private LayoutInflater inflater;
     private CategoryApi categoryApi;
+    private Context mContext;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public static boolean loadCategory = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,18 +86,36 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         adapter = new CustomListAdapter(this);
-        getCategoryFromServer();
-
         categoriesContainer = (LinearLayout) findViewById(R.id.categoriesContainer);
 
         inflater = LayoutInflater.from(this);
+        mContext = this;
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.RED, Color.GREEN, Color.GRAY);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getCategoryFromServer();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (loadCategory) {
+            getCategoryFromServer();
+            loadCategory = false;
+        }
     }
 
     private void getCategoryFromServer() {
-                Log.d(TAG, "get category from server called...");
+        Log.d(TAG, "get category from server called...");
         final Snackbar snackbar = Snackbar.make(fab, "Load categories...", Snackbar.LENGTH_INDEFINITE);
 
-        categoryApi.get(new JsonHttpResponseHandler(){
+        categoryApi.get(new JsonHttpResponseHandler() {
             @Override
             public void onStart() {
                 snackbar.show();
@@ -96,6 +125,7 @@ public class MainActivity extends AppCompatActivity
             public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
                 try {
                     JSONArray categories = response.getJSONArray("categories");
+                    categoriesContainer.removeAllViews();
                     for (int i = 0; i < categories.length(); i++) {
                         JSONObject category = categories.getJSONObject(i);
                         final int position = i;
@@ -106,7 +136,7 @@ public class MainActivity extends AppCompatActivity
                         textView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getApplicationContext(), DetailCategory.class);
+                                Intent intent = new Intent(mContext, DetailCategory.class);
                                 String detailCategory = null;
                                 try {
                                     detailCategory = response.getJSONArray("categories").getJSONObject(position).toString();
@@ -124,6 +154,7 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
+                swipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(fab, "Kategori telah dimuat", Snackbar.LENGTH_SHORT).show();
             }
 

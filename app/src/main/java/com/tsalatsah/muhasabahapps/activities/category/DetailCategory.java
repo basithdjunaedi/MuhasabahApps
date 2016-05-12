@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -33,6 +34,7 @@ public class DetailCategory extends AppCompatActivity implements View.OnClickLis
     private CategoryApi categoryApi;
     private boolean hasSubCategory;
     private FloatingActionButton addNewSubBtn;
+    public static boolean loadCategoryFromServer = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,22 +43,33 @@ public class DetailCategory extends AppCompatActivity implements View.OnClickLis
 
         categoryApi = new CategoryApi(this);
 
-        try {
-            category = new JSONObject(getIntent().getExtras().getString(EXTRA_CATEGORY));
-            setTitle(category.getString("name"));
-            callApiToLoadTheDataOfThisCategory();
-            Log.d(TAG, "ayo mosok iki gak diceluk..");
-        } catch (JSONException e) {
-            category = null;
-            e.printStackTrace();
-        }
-
         loadingText = (TextView) findViewById(R.id.loadingText);
         subCategoryAdapter = new SubCategoryAdapter(this);
         recordAdapter = new RecordAdapter(this);
 
         addNewSubBtn = (FloatingActionButton) findViewById(R.id.btnAddNewSub);
         addNewSubBtn.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (loadCategoryFromServer) {
+            loadCategoryDetailFromServer();
+            loadCategoryFromServer = false;
+        }
+    }
+
+    private void loadCategoryDetailFromServer() {
+        try {
+            category = new JSONObject(getIntent().getExtras().getString(EXTRA_CATEGORY));
+            setTitle(category.getString("name"));
+            callApiToLoadTheDataOfThisCategory();;
+        } catch (JSONException e) {
+            category = null;
+            e.printStackTrace();
+        }
     }
 
     private void callApiToLoadTheDataOfThisCategory() throws JSONException{
@@ -156,8 +169,18 @@ public class DetailCategory extends AppCompatActivity implements View.OnClickLis
 
         switch (id) {
             case R.id.btnAddNewSub:
-                Intent intent = new Intent(this, NewSubCategory.class);
-                startActivity(intent); // start the new sub category activity
+                if (hasSubCategory) {
+                    try {
+                        Intent intent = new Intent(this, NewSubCategory.class);
+                        intent.putExtra("categoryId", category.getInt("id"));
+                        startActivity(intent); // start the new sub category activity
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    Toast.makeText(DetailCategory.this, "Bikin record baru tah?", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
